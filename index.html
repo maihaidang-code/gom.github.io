@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gốm - CatBlue Handmade</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -23,7 +23,7 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             color: var(--text);
             line-height: 1.6;
             background: var(--bg);
@@ -350,7 +350,7 @@
             text-align: center;
             font-size: 16px;
             background: var(--white);
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .quantity-box input:focus {
@@ -786,7 +786,7 @@
                 </div>
 
                 <p class="description">
-                    CatBlue là một tác phẩm gốm thủ công độc đáo với thiết kế mèo dễ thương. Được tạo ra bằng tay từ đất sét cao cấp và trang trí với màu xanh dương tinh tế, sản phẩm này là sự kết hợp hoàn hảo của nghệ thuật và chức năng.
+                    CatBlue là một tác phẩm gốm thủ công độc đáo với thiết kế mèo dễ thương. Được tạo ra bằng tay từ đất sét cao cấp và trang trí vớ[...]
                 </p>
 
                 <div class="features">
@@ -998,47 +998,34 @@
             if (cartItems.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 20px 0;">Giỏ hàng trống</p>';
                 summary.style.display = 'none';
-            } else {
-                container.innerHTML = cartItems.map((item, index) => `
+                return;
+            }
+
+            let html = '';
+            let subtotal = 0;
+
+            cartItems.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                html += `
                     <div class="cart-item">
                         <div class="cart-item-info">
                             <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">₫${item.price.toLocaleString('vi-VN')}</div>
-                            <div style="font-size: 13px; color: var(--text-light); margin-top: 8px;">
-                                Số lượng: 
-                                <button onclick="decreaseCartItem(${index})" style="border: none; background: none; cursor: pointer; padding: 0 5px; font-weight: 500;">−</button>
-                                ${item.quantity}
-                                <button onclick="increaseCartItem(${index})" style="border: none; background: none; cursor: pointer; padding: 0 5px; font-weight: 500;">+</button>
-                            </div>
+                            <div class="cart-item-price">₫${item.price.toLocaleString()}</div>
                         </div>
-                        <button onclick="removeFromCart(${index})" style="border: none; background: none; cursor: pointer; font-size: 16px; color: var(--text-light); transition: color 0.3s;" onmouseover="this.style.color='var(--secondary)'" onmouseout="this.style.color='var(--text-light)'">✕</button>
+                        <div style="text-align: right;">
+                            <div>x${item.quantity}</div>
+                            <button onclick="removeFromCart(${index})" style="background: none; border: none; color: #f8e8cb; cursor: pointer; margin-top: 5px;">Xóa</button>
+                        </div>
                     </div>
-                `).join('');
+                `;
+            });
 
-                const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const shipping = 20000;
-                const total = subtotal + shipping;
-
-                document.getElementById('subtotal').textContent = '₫' + subtotal.toLocaleString('vi-VN');
-                document.getElementById('total').textContent = '₫' + total.toLocaleString('vi-VN');
-                summary.style.display = 'block';
-            }
-        }
-
-        function increaseCartItem(index) {
-            cartItems[index].quantity += 1;
-            updateCartCount();
-            updateCartDisplay();
-        }
-
-        function decreaseCartItem(index) {
-            if (cartItems[index].quantity > 1) {
-                cartItems[index].quantity -= 1;
-            } else {
-                removeFromCart(index);
-            }
-            updateCartCount();
-            updateCartDisplay();
+            container.innerHTML = html;
+            const total = subtotal + 20000;
+            document.getElementById('subtotal').textContent = '₫' + subtotal.toLocaleString();
+            document.getElementById('total').textContent = '₫' + total.toLocaleString();
+            summary.style.display = 'block';
         }
 
         function removeFromCart(index) {
@@ -1047,45 +1034,18 @@
             updateCartDisplay();
         }
 
-        function checkout() {
-            const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const total = subtotal + 20000;
-            alert(`Tổng tiền: ₫${total.toLocaleString('vi-VN')}\n\nVui lòng liên hệ:\nEmail: gom.lienhe@gmail.com\nhoặc gọi để xác nhận đơn hàng.`);
+        function showNotification(message) {
+            alert(message);
         }
 
         function buyNow() {
             addToCart();
-            setTimeout(toggleCart, 100);
+            toggleCart();
         }
 
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                top: 80px;
-                right: 20px;
-                background: var(--primary);
-                color: white;
-                padding: 14px 20px;
-                border-radius: 6px;
-                font-size: 13px;
-                z-index: 2000;
-                animation: slideIn 0.3s ease;
-                font-weight: 500;
-            `;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 2000);
+        function checkout() {
+            alert('Chức năng thanh toán sẽ được cập nhật sớm!');
         }
-
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(400px); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
